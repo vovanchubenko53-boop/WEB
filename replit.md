@@ -1,10 +1,13 @@
-# Solana Casino - Provably Fair Gaming Platform
+# TON Casino - Telegram Mini App
 
 ## Project Overview
-A stunning web-based casino gaming platform featuring Coin Flip, Dice, and Roulette games with a futuristic Solana-inspired design. The MVP focuses on beautiful UI/UX with simulated gameplay that can be extended to real blockchain integration.
+A Telegram Mini App casino gaming platform featuring Coin Flip, Dice, and Roulette games with TON blockchain integration. Built as a multi-page application with bottom navigation for seamless mobile experience.
 
 ## Features Implemented
-- ✅ Wallet connection interface (simulated)
+- ✅ TON Connect wallet integration
+- ✅ Telegram Mini App compatibility
+- ✅ Multi-page navigation (Games, Profile, Stats, FAQ)
+- ✅ Bottom navigation bar for mobile-first UX
 - ✅ Three casino games:
   - Coin Flip: 50/50 odds, 2x payout
   - Dice: Predict number 1-6, 6x payout
@@ -12,8 +15,9 @@ A stunning web-based casino gaming platform featuring Coin Flip, Dice, and Roule
 - ✅ Game history tracking
 - ✅ Balance management
 - ✅ Statistics dashboard
+- ✅ Profile page with wallet info
 - ✅ Responsive design for all devices
-- ✅ Dark casino theme with purple/blue neon accents
+- ✅ Dark casino theme with TON blue/cyan accents
 - ✅ Smooth animations and interactions
 - ✅ FAQ section
 - ✅ Complete backend API with game logic
@@ -21,14 +25,17 @@ A stunning web-based casino gaming platform featuring Coin Flip, Dice, and Roule
 ## Technology Stack
 - **Frontend**: React, TypeScript, Tailwind CSS, Shadcn UI, Framer Motion
 - **Backend**: Express.js, Node.js
+- **Blockchain**: TON Connect UI React
 - **Storage**: In-memory storage (MemStorage)
-- **Styling**: Custom casino theme with dark backgrounds and neon accents
+- **Routing**: Wouter (client-side routing)
+- **Styling**: Custom casino theme with TON-inspired colors
 
 ## Design System
-- **Primary Color**: Purple (#a855f7) - used for main CTAs and accents
-- **Secondary Color**: Cyan (#06b6d4) - used for highlights
+- **Primary Color**: TON Blue (#0088CC / hsl(204 100% 50%)) - main CTAs and accents
+- **Secondary Color**: Cyan (#33CCFF / hsl(188 100% 60%)) - highlights
 - **Typography**: Poppins (sans), Rajdhani (mono/gaming)
 - **Dark Mode**: Default theme with sophisticated dark backgrounds
+- **Theme**: TON-inspired blue/cyan gradient scheme
 
 ## API Endpoints
 - `POST /api/games/create` - Create a new game session
@@ -41,22 +48,21 @@ A stunning web-based casino gaming platform featuring Coin Flip, Dice, and Roule
 ```
 client/src/
   ├── components/
-  │   ├── Navigation.tsx - Top navigation with wallet connection
-  │   ├── Hero.tsx - Landing hero section
-  │   ├── GameCard.tsx - Reusable game card component
-  │   ├── Stats.tsx - Live statistics dashboard
+  │   ├── Navigation.tsx - Top navigation with TON Connect button
+  │   ├── BottomNav.tsx - Bottom navigation for mobile (Games, Stats, Profile, FAQ)
   │   ├── GameHistory.tsx - Recent plays feed
-  │   ├── HowItWorks.tsx - Feature showcase
-  │   ├── FAQ.tsx - Frequently asked questions
-  │   ├── Footer.tsx - Site footer
   │   └── games/
   │       ├── CoinFlip.tsx - Coin flip game
   │       ├── Dice.tsx - Dice roll game
   │       └── Roulette.tsx - Roulette game
   ├── contexts/
-  │   └── WalletContext.tsx - Wallet state management
+  │   └── TonWalletContext.tsx - TON wallet state management
   └── pages/
-      └── Home.tsx - Main home page
+      ├── Games.tsx - Games page with tabs (Coin Flip, Dice, Roulette)
+      ├── Profile.tsx - User profile with wallet info and history
+      ├── StatsPage.tsx - Live statistics dashboard
+      ├── FAQPage.tsx - Frequently asked questions
+      └── not-found.tsx - 404 page
 ```
 
 ## Game Logic
@@ -65,23 +71,38 @@ All games use provably fair random number generation on the backend:
 - **Dice**: 16.7% chance for each number (1-6)
 - **Roulette**: 2.7% for each number (0-36), ~48.6% for red/black
 
+## Pages & Navigation
+- **/games** - Main games page with tabbed interface (Coin Flip, Dice, Roulette)
+- **/profile** - User profile displaying wallet address, balance, and game history
+- **/stats** - Live statistics showing total volume, active players, games played
+- **/faq** - Frequently asked questions about the platform
+
+## TON Integration
+- **TON Connect**: Wallet connection via TON Connect UI React
+- **Wallet Support**: All TON Connect compatible wallets (Tonkeeper, OpenMask, MyTonWallet)
+- **Manifest**: Located at `/tonconnect-manifest.json`
+- **Return URL**: Configured for Telegram Mini App integration
+
 ## Future Enhancements
-- Real Solana blockchain integration
-- Actual wallet connection (Phantom, Solflare)
-- On-chain game verification
+- Real TON blockchain transactions
+- On-chain game verification with smart contracts
+- TON payment processing for bets and payouts
 - Jackpot game mode
 - User statistics and leaderboards
 - Progressive jackpot pool
 - Sound effects and music
 - More game varieties
+- Telegram notifications for wins
 
 ## Recent Changes (October 23, 2025)
-- Implemented complete MVP with all three games
-- Integrated backend API for game logic
-- Added game history tracking
-- Created beautiful casino-themed UI
-- Implemented responsive design
-- Added smooth animations throughout
+- ✅ Migrated from Solana to TON blockchain
+- ✅ Integrated TON Connect for wallet connection
+- ✅ Converted to Telegram Mini App format
+- ✅ Implemented multi-page navigation with bottom nav bar
+- ✅ Created separate pages: Games, Profile, Stats, FAQ
+- ✅ Updated color scheme to TON blue/cyan theme
+- ✅ Added mobile-first bottom navigation
+- ✅ Restructured app for better UX in Telegram
 
 ## Development
 The application runs on port 5000 with a single Express server serving both frontend and backend.

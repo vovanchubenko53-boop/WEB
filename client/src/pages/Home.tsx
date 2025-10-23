@@ -10,7 +10,7 @@ import { Footer } from '@/components/Footer';
 import { CoinFlip } from '@/components/games/CoinFlip';
 import { Dice } from '@/components/games/Dice';
 import { Roulette } from '@/components/games/Roulette';
-import { useWallet } from '@/contexts/WalletContext';
+import { useWallet } from '@/contexts/TonWalletContext';
 import { useToast } from '@/hooks/use-toast';
 
 import coinFlipImage from '@assets/generated_images/Coin_flip_game_preview_c60b993a.png';

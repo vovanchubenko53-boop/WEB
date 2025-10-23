@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { useWallet } from '@/contexts/WalletContext';
+import { useWallet } from '@/contexts/TonWalletContext';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Coins } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -56,7 +56,7 @@ export function CoinFlip({ onBack }: CoinFlipProps) {
     if (amount > balance) {
       toast({
         title: 'Insufficient Balance',
-        description: 'You don\'t have enough SOL for this bet',
+        description: 'You don\'t have enough TON for this bet',
         variant: 'destructive',
       });
       return;
@@ -97,8 +97,8 @@ export function CoinFlip({ onBack }: CoinFlipProps) {
             toast({
               title: won ? '🎉 You Won!' : 'Better Luck Next Time',
               description: won 
-                ? `You won ${amount.toFixed(2)} SOL!` 
-                : `You lost ${amount.toFixed(2)} SOL`,
+                ? `You won ${amount.toFixed(2)} TON!` 
+                : `You lost ${amount.toFixed(2)} TON`,
               variant: won ? 'default' : 'destructive',
             });
           }, 500);

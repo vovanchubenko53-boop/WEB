@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { useWallet } from '@/contexts/WalletContext';
+import { useWallet } from '@/contexts/TonWalletContext';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -69,7 +69,7 @@ export function Roulette({ onBack }: RouletteProps) {
     if (amount > balance) {
       toast({
         title: 'Insufficient Balance',
-        description: 'You don\'t have enough SOL for this bet',
+        description: 'You don\'t have enough TON for this bet',
         variant: 'destructive',
       });
       return;
@@ -113,8 +113,8 @@ export function Roulette({ onBack }: RouletteProps) {
             toast({
               title: won ? '🎉 You Won!' : 'Better Luck Next Time',
               description: won 
-                ? `You won ${(amount * (multiplier - 1)).toFixed(2)} SOL!` 
-                : `You lost ${amount.toFixed(2)} SOL`,
+                ? `You won ${(amount * (multiplier - 1)).toFixed(2)} TON!` 
+                : `You lost ${amount.toFixed(2)} TON`,
               variant: won ? 'default' : 'destructive',
             });
           }, 500);
@@ -320,7 +320,7 @@ export function Roulette({ onBack }: RouletteProps) {
               </Tabs>
 
               <div className="space-y-2">
-                <Label htmlFor="bet-amount">Bet Amount (SOL)</Label>
+                <Label htmlFor="bet-amount">Bet Amount (TON)</Label>
                 <Input
                   id="bet-amount"
                   type="number"
@@ -334,9 +334,9 @@ export function Roulette({ onBack }: RouletteProps) {
                   data-testid="input-bet-amount"
                 />
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <span>Balance: {balance.toFixed(2)} SOL</span>
+                  <span>Balance: {balance.toFixed(2)} TON</span>
                   <span>
-                    Potential Win: {(parseFloat(betAmount) * (betType === 'number' ? 36 : 2) || 0).toFixed(2)} SOL
+                    Potential Win: {(parseFloat(betAmount) * (betType === 'number' ? 36 : 2) || 0).toFixed(2)} TON
                   </span>
                 </div>
               </div>

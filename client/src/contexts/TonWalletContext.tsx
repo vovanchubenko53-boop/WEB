@@ -46,10 +46,10 @@ export function TonWalletProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useTonWallet() {
+export function useWallet() {
   const context = useContext(TonWalletContext);
   if (context === undefined) {
-    throw new Error('useTonWallet must be used within a TonWalletProvider');
+    throw new Error('useWallet must be used within a TonWalletProvider');
   }
   return context;
 }

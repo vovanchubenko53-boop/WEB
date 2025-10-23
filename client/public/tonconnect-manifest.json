@@ -1,7 +1,7 @@
 {
-  "url": "https://ton-casino.replit.app",
+  "url": "https://YOUR_REPLIT_APP.replit.app",
   "name": "TON Casino",
-  "iconUrl": "https://ton-casino.replit.app/favicon.png",
-  "termsOfUseUrl": "https://ton-casino.replit.app",
-  "privacyPolicyUrl": "https://ton-casino.replit.app"
+  "iconUrl": "https://YOUR_REPLIT_APP.replit.app/favicon.png",
+  "termsOfUseUrl": "https://YOUR_REPLIT_APP.replit.app",
+  "privacyPolicyUrl": "https://YOUR_REPLIT_APP.replit.app"
 }
