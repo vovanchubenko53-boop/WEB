@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useWallet } from '@/contexts/TonWalletContext';
 import { useTonConnectUI } from '@tonconnect/ui-react';
-import { X, Wallet } from 'lucide-react';
+import { Wallet } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface WithdrawModalProps {
@@ -121,15 +121,7 @@ export function WithdrawModal({ open, onClose }: WithdrawModalProps) {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md bg-[#1a1a1a] border-gray-800">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-2xl font-bold text-white">Withdraw</DialogTitle>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-white transition-colors"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
+          <DialogTitle className="text-2xl font-bold text-white">Withdraw</DialogTitle>
           <p className="text-sm text-gray-400">Using TON connect</p>
         </DialogHeader>
 

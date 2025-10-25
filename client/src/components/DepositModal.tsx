@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useWallet } from '@/contexts/TonWalletContext';
 import { useTonConnectUI } from '@tonconnect/ui-react';
-import { X, Wallet } from 'lucide-react';
+import { Wallet } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface DepositModalProps {
@@ -31,15 +31,6 @@ export function DepositModal({ open, onClose }: DepositModalProps) {
       toast({
         title: 'Invalid Amount',
         description: 'Please enter a valid deposit amount',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (depositAmount > walletBalance) {
-      toast({
-        title: 'Insufficient Funds',
-        description: 'Not enough funds in your wallet',
         variant: 'destructive',
       });
       return;
@@ -85,15 +76,7 @@ export function DepositModal({ open, onClose }: DepositModalProps) {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md bg-[#1a1a1a] border-gray-800">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-2xl font-bold text-white">Deposit</DialogTitle>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-white transition-colors"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
+          <DialogTitle className="text-2xl font-bold text-white">Deposit</DialogTitle>
           <p className="text-sm text-gray-400">Top-up only in TON</p>
         </DialogHeader>
 
