@@ -33,7 +33,7 @@ export function Hero() {
         {/* Main Heading */}
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
           <span className="bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent animate-pulse">
-            Solana Casino
+            TON Casino
           </span>
           <br />
           <span className="text-foreground text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
@@ -44,7 +44,7 @@ export function Hero() {
         {/* Subtitle */}
         <p className="text-lg sm:text-xl md:text-2xl text-foreground/90 mb-8 max-w-2xl mx-auto">
           Experience the future of online gaming with instant blockchain payouts, 
-          transparent odds, and lightning-fast transactions on Solana.
+          transparent odds, and lightning-fast transactions on TON.
         </p>
 
         {/* CTAs */}
