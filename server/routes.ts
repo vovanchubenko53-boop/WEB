@@ -3,7 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { createGameSchema, playGameSchema, insertUserSchema } from "@shared/schema";
 import { z } from "zod";
-import { sendTON } from "./services/ton";
+import { sendTON, getCasinoWalletAddress } from "./services/ton";
+import { Address } from "@ton/core";
 
 // Game logic functions
 function playRedNumbers() {
@@ -225,6 +226,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching withdrawal status:", error);
       return res.status(500).json({ error: "Failed to fetch withdrawal status" });
+    }
+  });
+
+  // Casino configuration routes
+  app.get("/api/casino/wallet-address", async (req, res) => {
+    try {
+      const rawAddress = await getCasinoWalletAddress();
+      const address = Address.parse(rawAddress);
+      const userFriendlyAddress = address.toString({ bounceable: false });
+      
+      return res.json({ address: userFriendlyAddress });
+    } catch (error) {
+      console.error("Error getting casino wallet address:", error);
+      return res.status(500).json({ error: "Failed to get casino wallet address" });
     }
   });
 

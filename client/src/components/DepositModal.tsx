@@ -94,12 +94,16 @@ export function DepositModal({ open, onClose }: DepositModalProps) {
 
       setDepositId(deposit.id);
 
-      const casinoWallet = import.meta.env.VITE_CASINO_WALLET_ADDRESS;
-      
-      if (!casinoWallet) {
+      let casinoWallet: string;
+      try {
+        const walletResponse = await fetch('/api/casino/wallet-address');
+        const walletData = await walletResponse.json();
+        casinoWallet = walletData.address;
+      } catch (error) {
+        console.error('Failed to get casino wallet address:', error);
         toast({
           title: 'Configuration Error',
-          description: 'Casino wallet address not configured. Please contact support.',
+          description: 'Failed to get casino wallet address. Please try again.',
           variant: 'destructive',
         });
         setIsProcessing(false);
