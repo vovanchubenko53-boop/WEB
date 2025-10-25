@@ -6,13 +6,13 @@ export function HowItWorks() {
     {
       icon: <Shield className="w-8 h-8" />,
       title: 'Provably Fair Gaming',
-      description: 'Every game result is verifiable on the Solana blockchain. Our smart contracts use cryptographic algorithms to ensure true randomness that cannot be manipulated by anyone - not even us.',
+      description: 'Every game result is verifiable on the TON blockchain. Our smart contracts use cryptographic algorithms to ensure true randomness that cannot be manipulated by anyone - not even us.',
       color: 'from-primary to-primary/50',
     },
     {
       icon: <Zap className="w-8 h-8" />,
       title: 'Instant Blockchain Payouts',
-      description: 'Win and receive your SOL immediately. No waiting periods, no withdrawal limits, no processing delays. Solana\'s lightning-fast network ensures your winnings are in your wallet within seconds.',
+      description: 'Win and receive your TON immediately. No waiting periods, no withdrawal limits, no processing delays. TON\'s lightning-fast network ensures your winnings are in your wallet within seconds.',
       color: 'from-secondary to-secondary/50',
     },
     {
@@ -24,7 +24,7 @@ export function HowItWorks() {
   ];
 
   const steps = [
-    'Connect your Solana wallet (Phantom, Solflare, or any compatible wallet)',
+    'Connect your TON wallet (Tonkeeper, OpenMask, or any compatible wallet)',
     'Choose your favorite game: Coin Flip, Dice, or Roulette',
     'Place your bet and make your prediction',
     'Watch the outcome in real-time with smooth animations',
@@ -37,7 +37,7 @@ export function HowItWorks() {
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            Why Choose Solana Casino?
+            Why Choose TON Casino?
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Experience the next generation of online gaming with blockchain technology

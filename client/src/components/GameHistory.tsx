@@ -57,7 +57,7 @@ export function GameHistory() {
                   </div>
                   <div className="text-sm">
                     <span className="text-muted-foreground">Bet: </span>
-                    <span className="font-mono font-semibold">{game.betAmount} SOL</span>
+                    <span className="font-mono font-semibold">{game.betAmount} TON</span>
                   </div>
                 </div>
                 
@@ -65,12 +65,12 @@ export function GameHistory() {
                   {game.won ? (
                     <div className="flex items-center gap-1 text-green-500">
                       <Trophy className="w-4 h-4" />
-                      <span className="font-mono font-bold">+{game.payout} SOL</span>
+                      <span className="font-mono font-bold">+{game.payout} TON</span>
                     </div>
                   ) : (
                     <div className="flex items-center gap-1 text-destructive">
                       <TrendingDown className="w-4 h-4" />
-                      <span className="font-mono font-bold">-{game.betAmount} SOL</span>
+                      <span className="font-mono font-bold">-{game.betAmount} TON</span>
                     </div>
                   )}
                 </div>

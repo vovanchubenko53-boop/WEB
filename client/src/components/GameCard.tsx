@@ -52,11 +52,11 @@ export function GameCard({
       <CardContent className="space-y-3">
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Min Bet</span>
-          <span className="font-mono font-semibold text-foreground">{minBet} SOL</span>
+          <span className="font-mono font-semibold text-foreground">{minBet} TON</span>
         </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Max Win</span>
-          <span className="font-mono font-semibold text-primary">{maxWin} SOL</span>
+          <span className="font-mono font-semibold text-primary">{maxWin} TON</span>
         </div>
       </CardContent>
 

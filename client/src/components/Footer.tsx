@@ -34,7 +34,7 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-1 sm:col-span-2 lg:col-span-1">
             <h3 className="text-2xl font-bold font-mono mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              SOLANA CASINO
+              TON CASINO
             </h3>
             <p className="text-sm text-muted-foreground mb-4">
               Experience the future of online gaming with provably fair, blockchain-powered casino games.
@@ -112,10 +112,10 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-border">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-            <p>&copy; {currentYear} Solana Casino. All rights reserved.</p>
+            <p>&copy; {currentYear} TON Casino. All rights reserved.</p>
             <p className="flex items-center gap-2">
               Powered by
-              <span className="font-mono font-semibold text-primary">Solana</span>
+              <span className="font-mono font-semibold text-primary">TON</span>
             </p>
           </div>
         </div>

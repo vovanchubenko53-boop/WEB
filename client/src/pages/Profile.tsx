@@ -1,105 +1,139 @@
-import { User, Wallet, TrendingUp, History } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 import { useWallet } from '@/contexts/TonWalletContext';
 import { useTonConnectUI } from '@tonconnect/ui-react';
+import { DepositModal } from '@/components/DepositModal';
+import { WithdrawModal } from '@/components/WithdrawModal';
+import { Plus, ArrowUp, SlidersHorizontal, Wallet } from 'lucide-react';
 import { GameHistory } from '@/components/GameHistory';
 
 export function Profile() {
-  const { connected, address, balance } = useWallet();
+  const { connected, address, appBalance, walletBalance } = useWallet();
   const [tonConnectUI] = useTonConnectUI();
+  const [depositModalOpen, setDepositModalOpen] = useState(false);
+  const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
 
   const formatAddress = (addr: string | null) => {
     if (!addr) return '';
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
   };
 
+  const handleDeposit = () => {
+    if (!connected) {
+      tonConnectUI.openModal();
+    } else {
+      setDepositModalOpen(true);
+    }
+  };
+
+  const handleWithdraw = () => {
+    if (!connected) {
+      tonConnectUI.openModal();
+    } else {
+      setWithdrawModalOpen(true);
+    }
+  };
+
   return (
-    <div className="min-h-screen pb-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <User className="w-8 h-8 text-primary" />
-            <h1 className="text-3xl sm:text-4xl font-bold">
-              <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                Profile
+    <div className="min-h-screen pb-20 bg-black">
+      <div className="max-w-md mx-auto px-4 py-6">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          {connected ? (
+            <button
+              onClick={() => tonConnectUI.openModal()}
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+            >
+              <Wallet className="w-5 h-5" />
+              <span className="text-sm">
+                Your wallet {formatAddress(address)} | {walletBalance.toFixed(1)} TON
               </span>
-            </h1>
+              <span className="text-xs">&gt;</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => tonConnectUI.openModal()}
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+            >
+              <Wallet className="w-5 h-5" />
+              <span className="text-sm">Wallet not connected</span>
+            </button>
+          )}
+          
+          {connected && (
+            <button className="text-white hover:text-gray-300 transition-colors">
+              Connect +
+            </button>
+          )}
+        </div>
+
+        {/* Main Wallet Card */}
+        <div className="bg-gradient-to-br from-[#0088CC] to-[#33CCFF] rounded-3xl p-8 mb-6 relative overflow-hidden">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-4 left-4 text-white text-6xl">🏠</div>
+            <div className="absolute top-4 right-4 text-white text-6xl">🏠</div>
+            <div className="absolute bottom-4 left-4 text-white text-6xl">🏠</div>
+            <div className="absolute bottom-4 right-4 text-white text-6xl">🏠</div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-6xl">🏠</div>
+          </div>
+
+          <div className="relative z-10">
+            <p className="text-white/80 text-sm text-center mb-2">Portals wallet balance</p>
+            <div className="text-center mb-6">
+              <span className="text-white text-5xl font-bold">{appBalance.toFixed(0)} TON</span>
+            </div>
+
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={handleDeposit}
+                className="flex items-center gap-2 bg-white hover:bg-gray-100 text-black font-semibold px-6 py-3 rounded-xl transition-all duration-200 hover:scale-105"
+              >
+                <span>Deposit</span>
+                <Plus className="w-4 h-4" />
+              </button>
+              <button
+                onClick={handleWithdraw}
+                className="flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 hover:scale-105"
+              >
+                <span>Withdraw</span>
+                <ArrowUp className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
 
-        {!connected ? (
-          <Card className="p-12 text-center max-w-md mx-auto">
-            <Wallet className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-            <h2 className="text-2xl font-bold mb-2">Connect Your Wallet</h2>
-            <p className="text-muted-foreground mb-6">
-              Connect your TON wallet to view your profile and game history
-            </p>
-            <Button
-              onClick={() => tonConnectUI.openModal()}
-              size="lg"
-              className="w-full"
-              data-testid="button-connect-wallet"
-            >
-              Connect TON Wallet
-            </Button>
-          </Card>
-        ) : (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-lg bg-primary/10 text-primary">
-                    <Wallet className="w-6 h-6" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-muted-foreground mb-1">Wallet Address</p>
-                    <p className="text-lg font-mono font-semibold" data-testid="text-wallet-address">
-                      {formatAddress(address)}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-lg bg-primary/10 text-primary">
-                    <TrendingUp className="w-6 h-6" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-muted-foreground mb-1">Balance</p>
-                    <p className="text-2xl font-bold font-mono" data-testid="text-balance">
-                      {balance.toFixed(2)} TON
-                    </p>
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-lg bg-primary/10 text-primary">
-                    <History className="w-6 h-6" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-muted-foreground mb-1">Total Games</p>
-                    <p className="text-2xl font-bold font-mono" data-testid="text-total-games">
-                      0
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            </div>
-
-            <Card className="p-6">
-              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                <History className="w-5 h-5" />
-                Recent Games
-              </h2>
-              <GameHistory />
-            </Card>
+        {/* Recent Actions */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-white text-xl font-bold">Recent Actions</h2>
+            <button className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700">
+              <span className="text-sm">Filter</span>
+              <SlidersHorizontal className="w-4 h-4" />
+            </button>
           </div>
-        )}
+
+          <div className="bg-[#1a1a1a] rounded-xl">
+            <GameHistory />
+          </div>
+
+          {/* Empty State */}
+          {!connected && (
+            <div className="text-center py-12">
+              <div className="mb-4 flex justify-center">
+                <div className="w-24 h-24 bg-gradient-to-br from-[#0088CC] to-[#33CCFF] rounded-full flex items-center justify-center">
+                  <span className="text-4xl">🎰</span>
+                </div>
+              </div>
+              <h3 className="text-white text-lg font-semibold mb-2">Make first transaction</h3>
+              <p className="text-gray-400">And start trading</p>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Modals */}
+      <DepositModal open={depositModalOpen} onClose={() => setDepositModalOpen(false)} />
+      <WithdrawModal open={withdrawModalOpen} onClose={() => setWithdrawModalOpen(false)} />
     </div>
   );
 }

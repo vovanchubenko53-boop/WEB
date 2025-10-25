@@ -1,11 +1,13 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useTonAddress, useTonWallet } from '@tonconnect/ui-react';
+import { useTonAddress, useTonWallet, useTonConnectUI } from '@tonconnect/ui-react';
 
 interface TonWalletContextType {
   connected: boolean;
   address: string | null;
-  balance: number;
-  updateBalance: (amount: number) => void;
+  walletBalance: number;
+  appBalance: number;
+  updateAppBalance: (amount: number) => void;
+  setAppBalance: (amount: number) => void;
 }
 
 const TonWalletContext = createContext<TonWalletContextType | undefined>(undefined);
@@ -13,23 +15,48 @@ const TonWalletContext = createContext<TonWalletContextType | undefined>(undefin
 export function TonWalletProvider({ children }: { children: ReactNode }) {
   const tonAddress = useTonAddress();
   const tonWallet = useTonWallet();
-  const [balance, setBalance] = useState(1000);
+  const [tonConnectUI] = useTonConnectUI();
+  const [appBalance, setAppBalanceState] = useState(0);
+  const [walletBalance, setWalletBalance] = useState(0);
 
   const connected = !!tonWallet;
 
   useEffect(() => {
-    const savedBalance = localStorage.getItem('ton_wallet_balance');
+    const savedBalance = localStorage.getItem('ton_app_balance');
     if (savedBalance) {
-      setBalance(parseFloat(savedBalance));
+      setAppBalanceState(parseFloat(savedBalance));
     }
   }, []);
 
-  const updateBalance = (amount: number) => {
-    setBalance(prev => {
+  useEffect(() => {
+    if (connected && tonAddress) {
+      fetch(`https://toncenter.com/api/v2/getAddressBalance?address=${tonAddress}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.result) {
+            const balance = parseInt(data.result) / 1000000000;
+            setWalletBalance(balance);
+          }
+        })
+        .catch(() => {
+          setWalletBalance(0);
+        });
+    } else {
+      setWalletBalance(0);
+    }
+  }, [connected, tonAddress]);
+
+  const updateAppBalance = (amount: number) => {
+    setAppBalanceState(prev => {
       const newBalance = prev + amount;
-      localStorage.setItem('ton_wallet_balance', newBalance.toString());
+      localStorage.setItem('ton_app_balance', newBalance.toString());
       return newBalance;
     });
+  };
+
+  const setAppBalance = (amount: number) => {
+    setAppBalanceState(amount);
+    localStorage.setItem('ton_app_balance', amount.toString());
   };
 
   return (
@@ -37,8 +64,10 @@ export function TonWalletProvider({ children }: { children: ReactNode }) {
       value={{
         connected,
         address: tonAddress || null,
-        balance,
-        updateBalance,
+        walletBalance,
+        appBalance,
+        updateAppBalance,
+        setAppBalance,
       }}
     >
       {children}

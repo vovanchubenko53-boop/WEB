@@ -16,7 +16,7 @@ interface DiceProps {
 }
 
 export function Dice({ onBack }: DiceProps) {
-  const { balance, updateBalance } = useWallet();
+  const { appBalance, updateAppBalance } = useWallet();
   const { toast } = useToast();
   const [betAmount, setBetAmount] = useState('1');
   const [prediction, setPrediction] = useState(3);
@@ -53,7 +53,7 @@ export function Dice({ onBack }: DiceProps) {
       return;
     }
 
-    if (amount > balance) {
+    if (amount > appBalance) {
       toast({
         title: 'Insufficient Balance',
         description: 'You don\'t have enough TON for this bet',
@@ -66,7 +66,7 @@ export function Dice({ onBack }: DiceProps) {
     setShowResult(false);
     
     // Deduct bet immediately
-    updateBalance(-amount);
+    updateAppBalance(-amount);
     
     try {
       // Create game session
@@ -90,7 +90,7 @@ export function Dice({ onBack }: DiceProps) {
           // Add winnings if won (bet already deducted, 6x payout total)
           const payout = won ? amount * 6 : 0;
           
-          updateBalance(payout);
+          updateAppBalance(payout);
           
           setTimeout(() => {
             setShowResult(true);
@@ -106,7 +106,7 @@ export function Dice({ onBack }: DiceProps) {
           console.error('Play error:', playError);
           setIsRolling(false);
           // Refund the bet on error
-          updateBalance(amount);
+          updateAppBalance(amount);
           toast({
             title: 'Error',
             description: 'Failed to play game. Bet refunded.',
@@ -118,7 +118,7 @@ export function Dice({ onBack }: DiceProps) {
       console.error('Game error:', error);
       setIsRolling(false);
       // Refund the bet on error
-      updateBalance(amount);
+      updateAppBalance(amount);
       toast({
         title: 'Error',
         description: 'Failed to create game. Bet refunded.',
@@ -247,7 +247,7 @@ export function Dice({ onBack }: DiceProps) {
                   type="number"
                   step="0.1"
                   min="0.1"
-                  max={balance}
+                  max={appBalance}
                   value={betAmount}
                   onChange={(e) => setBetAmount(e.target.value)}
                   disabled={isRolling}
@@ -255,7 +255,7 @@ export function Dice({ onBack }: DiceProps) {
                   data-testid="input-bet-amount"
                 />
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <span>Balance: {balance.toFixed(2)} TON</span>
+                  <span>Balance: {appBalance.toFixed(2)} TON</span>
                   <span>Potential Win: {(parseFloat(betAmount) * 6 || 0).toFixed(2)} TON</span>
                 </div>
               </div>

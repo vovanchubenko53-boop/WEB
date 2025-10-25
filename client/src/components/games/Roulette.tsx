@@ -22,7 +22,7 @@ type Color = 'red' | 'black';
 const redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
 
 export function Roulette({ onBack }: RouletteProps) {
-  const { balance, updateBalance } = useWallet();
+  const { appBalance, updateAppBalance } = useWallet();
   const { toast } = useToast();
   const [betAmount, setBetAmount] = useState('1');
   const [betType, setBetType] = useState<BetType>('color');
@@ -66,7 +66,7 @@ export function Roulette({ onBack }: RouletteProps) {
       return;
     }
 
-    if (amount > balance) {
+    if (amount > appBalance) {
       toast({
         title: 'Insufficient Balance',
         description: 'You don\'t have enough TON for this bet',
@@ -79,7 +79,7 @@ export function Roulette({ onBack }: RouletteProps) {
     setShowResult(false);
     
     // Deduct bet immediately
-    updateBalance(-amount);
+    updateAppBalance(-amount);
     
     try {
       const predictionValue = betType === 'number' ? selectedNumber : selectedColor;
@@ -106,7 +106,7 @@ export function Roulette({ onBack }: RouletteProps) {
           // Add winnings if won (bet already deducted)
           const payout = won ? amount * multiplier : 0;
           
-          updateBalance(payout);
+          updateAppBalance(payout);
           
           setTimeout(() => {
             setShowResult(true);
@@ -122,7 +122,7 @@ export function Roulette({ onBack }: RouletteProps) {
           console.error('Play error:', playError);
           setIsSpinning(false);
           // Refund the bet on error
-          updateBalance(amount);
+          updateAppBalance(amount);
           toast({
             title: 'Error',
             description: 'Failed to play game. Bet refunded.',
@@ -134,7 +134,7 @@ export function Roulette({ onBack }: RouletteProps) {
       console.error('Game error:', error);
       setIsSpinning(false);
       // Refund the bet on error
-      updateBalance(amount);
+      updateAppBalance(amount);
       toast({
         title: 'Error',
         description: 'Failed to create game. Bet refunded.',
@@ -326,7 +326,7 @@ export function Roulette({ onBack }: RouletteProps) {
                   type="number"
                   step="0.1"
                   min="0.1"
-                  max={balance}
+                  max={appBalance}
                   value={betAmount}
                   onChange={(e) => setBetAmount(e.target.value)}
                   disabled={isSpinning}
@@ -334,7 +334,7 @@ export function Roulette({ onBack }: RouletteProps) {
                   data-testid="input-bet-amount"
                 />
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <span>Balance: {balance.toFixed(2)} TON</span>
+                  <span>Balance: {appBalance.toFixed(2)} TON</span>
                   <span>
                     Potential Win: {(parseFloat(betAmount) * (betType === 'number' ? 36 : 2) || 0).toFixed(2)} TON
                   </span>

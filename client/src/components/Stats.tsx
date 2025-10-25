@@ -67,7 +67,7 @@ export function Stats() {
           <StatCard
             icon={<DollarSign className="w-6 h-6" />}
             label="Total Volume"
-            value={`${stats.volume} SOL`}
+            value={`${stats.volume} TON`}
             testId="stat-volume"
           />
           <StatCard
@@ -85,7 +85,7 @@ export function Stats() {
           <StatCard
             icon={<TrendingUp className="w-6 h-6" />}
             label="Total Winnings"
-            value={`${stats.winnings} SOL`}
+            value={`${stats.winnings} TON`}
             testId="stat-winnings"
           />
         </div>
