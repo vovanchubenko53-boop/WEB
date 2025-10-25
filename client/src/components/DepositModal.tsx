@@ -36,6 +36,15 @@ export function DepositModal({ open, onClose }: DepositModalProps) {
       return;
     }
 
+    if (!address) {
+      toast({
+        title: 'Wallet Not Connected',
+        description: 'Please connect your TON wallet first',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
@@ -43,28 +52,45 @@ export function DepositModal({ open, onClose }: DepositModalProps) {
         validUntil: Math.floor(Date.now() / 1000) + 360,
         messages: [
           {
-            address: "UQDkMPNjKkB3jqW5oBpB1TfJO3xVxLMh9mh3v7NqJcNGJxwb",
+            address: "EQDkMPNjKkB3jqW5oBpB1TfJO3xVxLMh9mh3v7NqJcNGJxwb",
             amount: String(Math.floor(depositAmount * 1000000000)),
           },
         ],
       };
 
-      await tonConnectUI.sendTransaction(transaction);
+      const result = await tonConnectUI.sendTransaction(transaction);
       
-      updateAppBalance(depositAmount);
-      
-      toast({
-        title: 'Deposit Successful',
-        description: `${depositAmount} TON deposited successfully`,
-      });
-      
-      setAmount('1');
-      onClose();
+      if (result) {
+        updateAppBalance(depositAmount);
+        
+        toast({
+          title: 'Deposit Successful',
+          description: `${depositAmount} TON deposited to your game balance`,
+        });
+        
+        setAmount('1');
+        onClose();
+      }
     } catch (error: any) {
       console.error('Deposit error:', error);
+      
+      let errorMessage = 'Failed to process deposit';
+      
+      if (error.message) {
+        if (error.message.includes('User rejected')) {
+          errorMessage = 'Transaction was cancelled';
+        } else if (error.message.includes('Insufficient funds')) {
+          errorMessage = 'Insufficient funds in your wallet';
+        } else if (error.message.includes('address')) {
+          errorMessage = 'Invalid address format. Please contact support.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: 'Deposit Failed',
-        description: error.message || 'Failed to process deposit',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {

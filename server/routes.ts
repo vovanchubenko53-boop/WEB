@@ -139,6 +139,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get recent game history (must be before :id route)
+  app.get("/api/games/history", async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const sessions = await storage.getRecentGameSessions(limit);
+      return res.json(sessions);
+    } catch (error) {
+      console.error("Error fetching game history:", error);
+      return res.status(500).json({ error: "Failed to fetch game history" });
+    }
+  });
+
   // Get game session by ID
   app.get("/api/games/:id", async (req, res) => {
     try {
@@ -152,18 +164,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching game:", error);
       return res.status(500).json({ error: "Failed to fetch game session" });
-    }
-  });
-
-  // Get recent game history
-  app.get("/api/games/history", async (req, res) => {
-    try {
-      const limit = parseInt(req.query.limit as string) || 10;
-      const sessions = await storage.getRecentGameSessions(limit);
-      return res.json(sessions);
-    } catch (error) {
-      console.error("Error fetching game history:", error);
-      return res.status(500).json({ error: "Failed to fetch game history" });
     }
   });
 
