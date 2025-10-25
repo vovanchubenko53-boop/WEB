@@ -94,7 +94,18 @@ All games use provably fair random number generation on the backend:
 - More game varieties
 - Telegram notifications for wins
 
-## Recent Changes (October 23, 2025)
+## Recent Changes
+### October 25, 2025 (Latest)
+- ✅ **Fixed TON Connect Transactions**: Changed to raw address format (0:...) for proper TON SDK compatibility
+- ✅ **Security Improvements**: Added mandatory casino wallet address configuration with validation
+- ✅ **Transaction Timeout**: Fixed validUntil from 360 to 300 seconds (TON SDK 5-minute limit)
+- ✅ **Error Handling**: Comprehensive error messages for all transaction failure scenarios
+- ✅ **Environment Variables**: Added VITE_CASINO_WALLET_ADDRESS for secure wallet configuration
+- ✅ **Accessibility**: Fixed dialog aria-describedby warnings
+- ✅ **Updated Manifest**: Configured TON Connect manifest with correct Replit domain
+- ✅ **Fixed API Routes**: Corrected route order to prevent 404 errors on game history endpoint
+
+### October 23, 2025
 - ✅ Migrated from Solana to TON blockchain
 - ✅ Integrated TON Connect for wallet connection
 - ✅ Converted to Telegram Mini App format
@@ -103,6 +114,21 @@ All games use provably fair random number generation on the backend:
 - ✅ Updated color scheme to TON blue/cyan theme
 - ✅ Added mobile-first bottom navigation
 - ✅ Restructured app for better UX in Telegram
+
+## Environment Configuration
+
+### Required Environment Variables
+
+Create a `.env` file in the root directory (copy from `.env.example`):
+
+```bash
+cp .env.example .env
+```
+
+**VITE_CASINO_WALLET_ADDRESS** - Casino wallet address in raw format where deposits will be sent
+- Format: `workchain:account_id` (e.g., `0:e430f363...`)
+- Convert from user-friendly format using https://ton-address-converter.com/
+- **CRITICAL**: Without this variable, deposits will be blocked for security
 
 ## Development
 The application runs on port 5000 with a single Express server serving both frontend and backend.

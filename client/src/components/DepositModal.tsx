@@ -48,11 +48,24 @@ export function DepositModal({ open, onClose }: DepositModalProps) {
     setIsProcessing(true);
 
     try {
+      // Casino wallet address must be configured in .env file
+      const casinoWallet = import.meta.env.VITE_CASINO_WALLET_ADDRESS;
+      
+      if (!casinoWallet) {
+        toast({
+          title: 'Configuration Error',
+          description: 'Casino wallet address not configured. Please contact support.',
+          variant: 'destructive',
+        });
+        setIsProcessing(false);
+        return;
+      }
+      
       const transaction = {
-        validUntil: Math.floor(Date.now() / 1000) + 360,
+        validUntil: Math.floor(Date.now() / 1000) + 300,
         messages: [
           {
-            address: "EQDkMPNjKkB3jqW5oBpB1TfJO3xVxLMh9mh3v7NqJcNGJxwb",
+            address: casinoWallet,
             amount: String(Math.floor(depositAmount * 1000000000)),
           },
         ],
@@ -60,29 +73,27 @@ export function DepositModal({ open, onClose }: DepositModalProps) {
 
       const result = await tonConnectUI.sendTransaction(transaction);
       
-      if (result) {
-        updateAppBalance(depositAmount);
-        
-        toast({
-          title: 'Deposit Successful',
-          description: `${depositAmount} TON deposited to your game balance`,
-        });
-        
-        setAmount('1');
-        onClose();
-      }
+      updateAppBalance(depositAmount);
+      
+      toast({
+        title: 'Deposit Successful',
+        description: `${depositAmount} TON deposited to your game balance`,
+      });
+      
+      setAmount('1');
+      onClose();
     } catch (error: any) {
       console.error('Deposit error:', error);
       
       let errorMessage = 'Failed to process deposit';
       
-      if (error.message) {
-        if (error.message.includes('User rejected')) {
+      if (error?.message) {
+        if (error.message.includes('User rejected') || error.message.includes('rejected')) {
           errorMessage = 'Transaction was cancelled';
-        } else if (error.message.includes('Insufficient funds')) {
+        } else if (error.message.includes('Insufficient funds') || error.message.includes('insufficient')) {
           errorMessage = 'Insufficient funds in your wallet';
-        } else if (error.message.includes('address')) {
-          errorMessage = 'Invalid address format. Please contact support.';
+        } else if (error.message.includes('WalletAlreadyConnectedError')) {
+          errorMessage = 'Wallet already connected. Please try again.';
         } else {
           errorMessage = error.message;
         }
@@ -100,10 +111,10 @@ export function DepositModal({ open, onClose }: DepositModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-[#1a1a1a] border-gray-800">
+      <DialogContent className="sm:max-w-md bg-[#1a1a1a] border-gray-800" aria-describedby="deposit-description">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-white">Deposit</DialogTitle>
-          <p className="text-sm text-gray-400">Top-up only in TON</p>
+          <p id="deposit-description" className="text-sm text-gray-400">Top-up only in TON</p>
         </DialogHeader>
 
         <div className="space-y-6 pt-4">

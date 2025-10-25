@@ -119,10 +119,10 @@ export function WithdrawModal({ open, onClose }: WithdrawModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-[#1a1a1a] border-gray-800">
+      <DialogContent className="sm:max-w-md bg-[#1a1a1a] border-gray-800" aria-describedby="withdraw-description">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-white">Withdraw</DialogTitle>
-          <p className="text-sm text-gray-400">Using TON connect</p>
+          <p id="withdraw-description" className="text-sm text-gray-400">Using TON connect</p>
         </DialogHeader>
 
         <div className="space-y-6 pt-4">
