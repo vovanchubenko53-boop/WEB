@@ -42,6 +42,7 @@ export function Profile() {
             <button
               onClick={() => tonConnectUI.openModal()}
               className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+              data-testid="button-connect-wallet"
             >
               <Wallet className="w-5 h-5" />
               <span className="text-sm">Wallet not connected</span>
@@ -50,26 +51,36 @@ export function Profile() {
             <div className="flex-1"></div>
           )}
           
-          <button 
-            onClick={() => tonConnectUI.openModal()}
-            className="text-white hover:text-gray-300 transition-colors font-medium"
-          >
-            Connect +
-          </button>
+          {!connected ? (
+            <button 
+              onClick={() => tonConnectUI.openModal()}
+              className="text-white hover:text-gray-300 transition-colors font-medium"
+              data-testid="button-connect-header"
+            >
+              Connect +
+            </button>
+          ) : (
+            <button 
+              onClick={() => tonConnectUI.disconnect()}
+              className="text-red-400 hover:text-red-300 transition-colors font-medium"
+              data-testid="button-disconnect"
+            >
+              Disconnect
+            </button>
+          )}
         </div>
 
         {/* Wallet Info Above Card */}
         {connected && (
-          <button
-            onClick={() => tonConnectUI.openModal()}
-            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-4 w-full"
+          <div
+            className="flex items-center gap-2 text-gray-400 mb-4 w-full"
+            data-testid="text-wallet-info"
           >
             <Wallet className="w-4 h-4" />
             <span className="text-sm">
               Your wallet {formatAddress(address)} | {walletBalance.toFixed(1)} TON
             </span>
-            <span className="text-xs ml-auto">&gt;</span>
-          </button>
+          </div>
         )}
 
         {/* Main Wallet Card */}

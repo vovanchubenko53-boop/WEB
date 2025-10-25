@@ -130,6 +130,40 @@ cp .env.example .env
 - Convert from user-friendly format using https://ton-address-converter.com/
 - **CRITICAL**: Without this variable, deposits will be blocked for security
 
+## Deposit & Withdrawal System
+
+### How It Works
+
+The application uses **TON Connect** to integrate with TON blockchain without requiring custom smart contracts. See `DEPOSIT_WITHDRAWAL_GUIDE.md` for complete documentation.
+
+#### Deposits
+1. User clicks "Deposit" in profile
+2. Specifies amount to deposit
+3. TON Connect creates transaction from user wallet to casino wallet
+4. User confirms in their TON wallet (Tonkeeper, MyTonWallet, etc.)
+5. App balance updates automatically
+
+#### Withdrawals
+Currently implemented as a placeholder. For production:
+- Requires backend service to automatically send TON from casino wallet
+- Needs TON SDK integration on server
+- Must securely store casino wallet private key
+
+### Configuration
+
+**Casino Wallet Address** must be configured in `.env`:
+```bash
+VITE_CASINO_WALLET_ADDRESS=0:YOUR_RAW_ADDRESS_HERE
+```
+
+Convert user-friendly address (EQ...) to raw format (0:...) using https://ton-address-converter.com/
+
+### Current Status
+✅ **Working:** Deposits, wallet connection, balance display  
+❌ **Needs Implementation:** Automatic withdrawals, transaction monitoring, database persistence
+
+**Full guide:** See `DEPOSIT_WITHDRAWAL_GUIDE.md` for architecture, security, and implementation details.
+
 ## Development
 The application runs on port 5000 with a single Express server serving both frontend and backend.
 
