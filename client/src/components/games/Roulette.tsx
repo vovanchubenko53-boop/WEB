@@ -22,7 +22,7 @@ type Color = 'red' | 'black';
 const redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
 
 export function Roulette({ onBack }: RouletteProps) {
-  const { appBalance, updateAppBalance } = useWallet();
+  const { appBalance, address, refreshBalance } = useWallet();
   const { toast } = useToast();
   const [betAmount, setBetAmount] = useState('1');
   const [betType, setBetType] = useState<BetType>('color');
@@ -38,7 +38,7 @@ export function Roulette({ onBack }: RouletteProps) {
   };
 
   const createGameMutation = useMutation({
-    mutationFn: async (data: { gameType: string; betAmount: number; prediction: string | number }) => {
+    mutationFn: async (data: { gameType: string; betAmount: number; prediction: string | number; tonAddress: string }) => {
       const res = await apiRequest('POST', '/api/games/create', data);
       return await res.json();
     },
@@ -66,6 +66,15 @@ export function Roulette({ onBack }: RouletteProps) {
       return;
     }
 
+    if (!address) {
+      toast({
+        title: 'Wallet Not Connected',
+        description: 'Please connect your TON wallet first',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     if (amount > appBalance) {
       toast({
         title: 'Insufficient Balance',
@@ -78,23 +87,20 @@ export function Roulette({ onBack }: RouletteProps) {
     setIsSpinning(true);
     setShowResult(false);
     
-    // Deduct bet immediately
-    updateAppBalance(-amount);
-    
     try {
       const predictionValue = betType === 'number' ? selectedNumber : selectedColor;
       
-      // Create game session
       const session = await createGameMutation.mutateAsync({
         gameType: 'roulette',
         betAmount: amount,
         prediction: predictionValue,
+        tonAddress: address,
       });
       
-      // Simulate roulette spin
+      refreshBalance();
+      
       setTimeout(async () => {
         try {
-          // Play the game
           const gameResult = await playGameMutation.mutateAsync({ sessionId: session.id });
           
           const outcome = parseInt(gameResult.result);
@@ -103,10 +109,8 @@ export function Roulette({ onBack }: RouletteProps) {
           
           const won = gameResult.won;
           const multiplier = betType === 'number' ? 36 : 2;
-          // Add winnings if won (bet already deducted)
-          const payout = won ? amount * multiplier : 0;
           
-          updateAppBalance(payout);
+          refreshBalance();
           
           setTimeout(() => {
             setShowResult(true);
@@ -121,23 +125,21 @@ export function Roulette({ onBack }: RouletteProps) {
         } catch (playError) {
           console.error('Play error:', playError);
           setIsSpinning(false);
-          // Refund the bet on error
-          updateAppBalance(amount);
+          refreshBalance();
           toast({
             title: 'Error',
-            description: 'Failed to play game. Bet refunded.',
+            description: 'Failed to play game.',
             variant: 'destructive',
           });
         }
       }, 3000);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Game error:', error);
       setIsSpinning(false);
-      // Refund the bet on error
-      updateAppBalance(amount);
+      refreshBalance();
       toast({
         title: 'Error',
-        description: 'Failed to create game. Bet refunded.',
+        description: error.message || 'Failed to create game.',
         variant: 'destructive',
       });
     }

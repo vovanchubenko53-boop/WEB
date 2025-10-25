@@ -1,6 +1,8 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { storage } from "./storage";
+import { getIncomingTransactions, getCasinoWalletAddress } from "./services/ton";
 
 const app = express();
 
@@ -46,6 +48,42 @@ app.use((req, res, next) => {
   next();
 });
 
+async function monitorDeposits() {
+  try {
+    const casinoAddress = await getCasinoWalletAddress();
+    const transactions = await getIncomingTransactions(casinoAddress, 20);
+    
+    for (const tx of transactions) {
+      const existingDeposit = await storage.getDepositByTxHash(tx.hash);
+      
+      if (!existingDeposit) {
+        continue;
+      }
+
+      if (existingDeposit.status === "confirmed") {
+        continue;
+      }
+
+      const depositAmount = parseFloat(existingDeposit.amount);
+      
+      if (Math.abs(tx.amount - depositAmount) < 0.01) {
+        await storage.updateDepositStatus(existingDeposit.id, "confirmed", tx.hash);
+        
+        const user = await storage.getUserById(existingDeposit.userId);
+        if (user) {
+          const currentBalance = parseFloat(user.balance);
+          const newBalance = (currentBalance + depositAmount).toFixed(2);
+          await storage.updateUserBalance(user.id, newBalance);
+          
+          log(`Deposit confirmed: ${depositAmount} TON credited to user ${user.id}`);
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Error monitoring deposits:", error);
+  }
+}
+
 (async () => {
   const server = await registerRoutes(app);
 
@@ -57,19 +95,12 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || '5000', 10);
   server.listen({
     port,
@@ -78,4 +109,7 @@ app.use((req, res, next) => {
   }, () => {
     log(`serving on port ${port}`);
   });
+
+  setInterval(monitorDeposits, 10000);
+  log("Deposit monitoring started (polling every 10 seconds)");
 })();

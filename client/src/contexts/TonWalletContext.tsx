@@ -1,13 +1,16 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useTonAddress, useTonWallet, useTonConnectUI } from '@tonconnect/ui-react';
+import { useTonAddress, useTonWallet } from '@tonconnect/ui-react';
+import { useQuery } from '@tanstack/react-query';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import type { User } from '@shared/schema';
 
 interface TonWalletContextType {
   connected: boolean;
   address: string | null;
   walletBalance: number;
   appBalance: number;
-  updateAppBalance: (amount: number) => void;
-  setAppBalance: (amount: number) => void;
+  isLoadingBalance: boolean;
+  refreshBalance: () => void;
 }
 
 const TonWalletContext = createContext<TonWalletContextType | undefined>(undefined);
@@ -15,18 +18,31 @@ const TonWalletContext = createContext<TonWalletContextType | undefined>(undefin
 export function TonWalletProvider({ children }: { children: ReactNode }) {
   const tonAddress = useTonAddress();
   const tonWallet = useTonWallet();
-  const [tonConnectUI] = useTonConnectUI();
-  const [appBalance, setAppBalanceState] = useState(0);
   const [walletBalance, setWalletBalance] = useState(0);
 
   const connected = !!tonWallet;
 
-  useEffect(() => {
-    const savedBalance = localStorage.getItem('ton_app_balance');
-    if (savedBalance) {
-      setAppBalanceState(parseFloat(savedBalance));
-    }
-  }, []);
+  const { data: user, isLoading: isLoadingBalance, refetch: refreshBalance } = useQuery<User>({
+    queryKey: ['/api/users/me', tonAddress],
+    enabled: connected && !!tonAddress,
+    queryFn: async () => {
+      const response = await fetch(`/api/users/me?address=${tonAddress}`);
+      if (!response.ok) {
+        if (response.status === 404) {
+          const registerResponse = await apiRequest('/api/users/register', {
+            method: 'POST',
+            body: JSON.stringify({ tonAddress }),
+          });
+          return registerResponse;
+        }
+        throw new Error('Failed to fetch user');
+      }
+      return response.json();
+    },
+    refetchInterval: 5000,
+  });
+
+  const appBalance = user ? parseFloat(user.balance) : 0;
 
   useEffect(() => {
     if (connected && tonAddress) {
@@ -46,19 +62,6 @@ export function TonWalletProvider({ children }: { children: ReactNode }) {
     }
   }, [connected, tonAddress]);
 
-  const updateAppBalance = (amount: number) => {
-    setAppBalanceState(prev => {
-      const newBalance = prev + amount;
-      localStorage.setItem('ton_app_balance', newBalance.toString());
-      return newBalance;
-    });
-  };
-
-  const setAppBalance = (amount: number) => {
-    setAppBalanceState(amount);
-    localStorage.setItem('ton_app_balance', amount.toString());
-  };
-
   return (
     <TonWalletContext.Provider
       value={{
@@ -66,8 +69,8 @@ export function TonWalletProvider({ children }: { children: ReactNode }) {
         address: tonAddress || null,
         walletBalance,
         appBalance,
-        updateAppBalance,
-        setAppBalance,
+        isLoadingBalance,
+        refreshBalance,
       }}
     >
       {children}

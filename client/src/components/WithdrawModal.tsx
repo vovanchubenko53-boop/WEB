@@ -3,9 +3,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useWallet } from '@/contexts/TonWalletContext';
-import { useTonConnectUI } from '@tonconnect/ui-react';
-import { Wallet } from 'lucide-react';
+import { Wallet, CheckCircle2, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 
 interface WithdrawModalProps {
   open: boolean;
@@ -16,11 +16,11 @@ const TRANSACTION_LIMIT = 1500;
 const DAILY_LIMIT = 7500;
 
 export function WithdrawModal({ open, onClose }: WithdrawModalProps) {
-  const { address, appBalance, updateAppBalance } = useWallet();
-  const [tonConnectUI] = useTonConnectUI();
+  const { address, appBalance, refreshBalance } = useWallet();
   const { toast } = useToast();
   const [amount, setAmount] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [dailyWithdrawn, setDailyWithdrawn] = useState(0);
   const [error, setError] = useState('');
 
@@ -90,23 +90,41 @@ export function WithdrawModal({ open, onClose }: WithdrawModalProps) {
       return;
     }
 
+    if (!address) {
+      toast({
+        title: 'Wallet Not Connected',
+        description: 'Please connect your TON wallet first',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
-      updateAppBalance(-withdrawAmount);
+      const res = await apiRequest('POST', '/api/withdrawals/request', {
+        tonAddress: address,
+        amount: withdrawAmount,
+      });
+      const withdrawal = await res.json();
+
       setDailyWithdrawn(prev => prev + withdrawAmount);
+      setIsSuccess(true);
+      refreshBalance();
       
       toast({
         title: 'Withdrawal Successful',
-        description: `${withdrawAmount} TON withdrawn successfully`,
+        description: `${withdrawAmount} TON has been sent to your wallet`,
       });
       
-      setAmount('');
-      setError('');
-      onClose();
+      setTimeout(() => {
+        setAmount('');
+        setError('');
+        setIsSuccess(false);
+        onClose();
+      }, 2000);
     } catch (error: any) {
       console.error('Withdrawal error:', error);
-      updateAppBalance(withdrawAmount);
       toast({
         title: 'Withdrawal Failed',
         description: error.message || 'Failed to process withdrawal',
@@ -119,9 +137,9 @@ export function WithdrawModal({ open, onClose }: WithdrawModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-[#1a1a1a] border-gray-800" aria-describedby="withdraw-description">
+      <DialogContent className="sm:max-w-md bg-[#1a1a1a] border-gray-800" aria-describedby="withdraw-description" data-testid="dialog-withdraw">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-white">Withdraw</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-white" data-testid="text-withdraw-title">Withdraw</DialogTitle>
           <p id="withdraw-description" className="text-sm text-gray-400">Using TON connect</p>
         </DialogHeader>
 
@@ -130,54 +148,73 @@ export function WithdrawModal({ open, onClose }: WithdrawModalProps) {
             <p className="text-sm text-gray-400 mb-2">Your connected wallet</p>
             <div className="flex items-center justify-center gap-2 text-white">
               <Wallet className="w-4 h-4 text-[#0088CC]" />
-              <span className="font-mono">{formatAddress(address)}</span>
+              <span className="font-mono" data-testid="text-wallet-address">{formatAddress(address)}</span>
             </div>
           </div>
 
-          <div className="text-center">
-            <div className="relative">
-              <Input
-                type="number"
-                value={amount}
-                onChange={(e) => handleAmountChange(e.target.value)}
-                className={`text-center text-4xl font-bold border-0 bg-transparent ${
-                  error ? 'text-red-500' : 'text-white'
-                } focus-visible:ring-0 focus-visible:ring-offset-0`}
-                placeholder="0."
-                min="0"
-                step="0.1"
-              />
-              <span className="text-2xl text-gray-400 font-bold ml-2">TON</span>
+          {isSuccess ? (
+            <div className="text-center py-8">
+              <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
+              <p className="text-white text-lg font-semibold">Withdrawal Successful!</p>
+              <p className="text-gray-400 mt-2">TON sent to your wallet</p>
             </div>
-            <button
-              onClick={handleMaxClick}
-              className="text-[#0088CC] font-semibold mt-2 hover:text-[#0099DD] transition-colors"
-            >
-              Max
-            </button>
-            {error && (
-              <p className="text-red-500 text-sm mt-2">{error}</p>
-            )}
-          </div>
+          ) : isProcessing ? (
+            <div className="text-center py-8">
+              <Loader2 className="w-16 h-16 text-[#0088CC] mx-auto mb-4 animate-spin" />
+              <p className="text-white text-lg font-semibold">Processing Withdrawal...</p>
+              <p className="text-gray-400 mt-2">Please wait...</p>
+            </div>
+          ) : (
+            <>
+              <div className="text-center">
+                <div className="relative">
+                  <Input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => handleAmountChange(e.target.value)}
+                    className={`text-center text-4xl font-bold border-0 bg-transparent ${
+                      error ? 'text-red-500' : 'text-white'
+                    } focus-visible:ring-0 focus-visible:ring-offset-0`}
+                    placeholder="0."
+                    min="0"
+                    step="0.1"
+                    data-testid="input-withdraw-amount"
+                  />
+                  <span className="text-2xl text-gray-400 font-bold ml-2">TON</span>
+                </div>
+                <button
+                  onClick={handleMaxClick}
+                  className="text-[#0088CC] font-semibold mt-2 hover:text-[#0099DD] transition-colors"
+                  data-testid="button-max-amount"
+                >
+                  Max
+                </button>
+                {error && (
+                  <p className="text-red-500 text-sm mt-2" data-testid="text-error">{error}</p>
+                )}
+              </div>
 
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between text-gray-400">
-              <span>Transaction limit</span>
-              <span className="text-white">{TRANSACTION_LIMIT} TON</span>
-            </div>
-            <div className="flex justify-between text-gray-400">
-              <span>Daily limit</span>
-              <span className="text-white">{dailyWithdrawn} / {DAILY_LIMIT} TON</span>
-            </div>
-          </div>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between text-gray-400">
+                  <span>Transaction limit</span>
+                  <span className="text-white" data-testid="text-transaction-limit">{TRANSACTION_LIMIT} TON</span>
+                </div>
+                <div className="flex justify-between text-gray-400">
+                  <span>Daily limit</span>
+                  <span className="text-white" data-testid="text-daily-limit">{dailyWithdrawn} / {DAILY_LIMIT} TON</span>
+                </div>
+              </div>
 
-          <Button
-            onClick={handleWithdraw}
-            disabled={isProcessing || !!error || !amount}
-            className="w-full bg-[#0088CC] hover:bg-[#0099DD] text-white font-bold py-6 text-lg rounded-xl disabled:opacity-50"
-          >
-            {isProcessing ? 'Processing...' : 'Withdraw'}
-          </Button>
+              <Button
+                onClick={handleWithdraw}
+                disabled={isProcessing || !!error || !amount}
+                className="w-full bg-[#0088CC] hover:bg-[#0099DD] text-white font-bold py-6 text-lg rounded-xl disabled:opacity-50"
+                data-testid="button-withdraw"
+              >
+                {isProcessing ? 'Processing...' : 'Withdraw'}
+              </Button>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>
