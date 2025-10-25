@@ -46,7 +46,7 @@ export async function sendTON(toAddress: string, amount: number): Promise<string
     const contract = client.open(wallet);
     const seqno = await contract.getSeqno();
 
-    const transfer = await contract.sendTransfer({
+    await contract.sendTransfer({
       seqno,
       secretKey: keyPair.secretKey,
       messages: [
@@ -58,7 +58,7 @@ export async function sendTON(toAddress: string, amount: number): Promise<string
       ],
     });
 
-    return transfer.toString();
+    return `withdrawal_${Date.now()}_${seqno}`;
   } catch (error) {
     console.error("Error sending TON:", error);
     throw new Error(`Failed to send TON: ${error instanceof Error ? error.message : 'Unknown error'}`);
